@@ -13,6 +13,7 @@ import { Dropdown, Menu, MenuButton, MenuItem, menuItemClasses } from "@mui/base
 import Filter from "./Filter";
 import User from "./User";
 import DeleteClient from "./Delete";
+import CreateClient from "./CreateClient";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 
 const blue = {
@@ -90,7 +91,9 @@ const Clients = () => {
   const dispatch = useDispatch();
   const { clients, isFetching, error, loggedUser } = useSelector((state) => state.user);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [editForm, setEditForm] = useState({
     firstName: '',
     lastName: '',
@@ -229,6 +232,7 @@ const Clients = () => {
       <DeleteClient open={openDeleteModal} setOpen={setOpenDeleteModal} userId={selectedUserId} />
       <Filter open={openFilters} setOpen={setOpenFilters} />
       <User open={openUser} setOpen={setOpenUser} />
+      <CreateClient open={createModalOpen} setOpen={setCreateModalOpen} />
 
       {/* Edit Client Modal */}
       <Dialog open={editModalOpen} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
@@ -275,7 +279,13 @@ const Clients = () => {
         </DialogActions>
       </Dialog>
 
-      <Topbar />
+      <Topbar 
+        openFilters={openFilters}
+        setOpenFilters={setOpenFilters}
+        isFiltered={isFiltered}
+        setIsFiltered={setIsFiltered}
+        onCreateClick={() => setCreateModalOpen(true)}
+      />
       <Table
         rows={clients}
         columns={columns}

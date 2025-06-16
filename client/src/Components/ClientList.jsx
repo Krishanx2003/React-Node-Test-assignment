@@ -59,6 +59,51 @@ const ClientList = () => {
     },
   ];
 
+  const validateField = (field, value) => {
+    let error = false;
+    let message = "";
+
+    switch (field) {
+      case "name":
+        if (!value.trim()) {
+          error = true;
+          message = "Name is required";
+        }
+        break;
+      case "email":
+        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = true;
+          message = "Please enter a valid email address";
+        }
+        break;
+      case "phone":
+        if (!value) {
+          error = true;
+          message = "Phone number is required";
+        } else if (!/^\d{10,11}$/.test(value)) {
+          error = true;
+          message = "Please enter a valid phone number (10-11 digits)";
+        }
+        break;
+      case "address":
+        if (!value.trim()) {
+          error = true;
+          message = "Address is required";
+        }
+        break;
+    }
+    return { error, message };
+  };
+
+  const initialValidationState = {
+    firstName: { error: false, message: "" },
+    lastName: { error: false, message: "" },
+    username: { error: false, message: "" },
+    password: { error: false, message: "" },
+    phone: { error: false, message: "" },
+    email: { error: false, message: "" },
+  }
+
   return (
     <div className="p-6">
       <div className="mb-4">

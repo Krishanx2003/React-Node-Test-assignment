@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast'
 import * as api from '../api'
-import { start, end, error, registerReducer, loginReducer, logoutReducer, getUserReducer, getClientsReducer, getUsersReducer, getEmployeesReducer, createClientReducer, createEmployeeReducer, updateUserReducer, deleteUserReducer, } from '../reducer/user'
+import { start, end, error, registerReducer, loginReducer, logoutReducer, getUserReducer, getClientsReducer, getUsersReducer, getEmployeesReducer, createClientReducer, createEmployeeReducer, updateUserReducer, deleteUserReducer, updateClientReducer } from '../reducer/user'
 import Cookies from 'js-cookie'
 
 export const register = (userData, navigate) => async (dispatch) => {
@@ -152,6 +152,19 @@ export const createClient = (clientData) => async (dispatch) => {
         const { data } = await api.createClient(clientData)
         dispatch(createClientReducer(data.result))
         navigate('/clients')
+        dispatch(end())
+    } catch (err) {
+        const message = err?.response?.data?.message || err?.message || "Something went wrong"
+        toast.error(message)
+        dispatch(error(err.message))
+    }
+}
+export const updateClient = (clientData) => async (dispatch) => {
+    try {
+        dispatch(start())
+        const { data } = await api.updateClient(clientData)
+        dispatch(updateClientReducer(data.result))
+        toast.success('Client updated successfully')
         dispatch(end())
     } catch (err) {
         const message = err?.response?.data?.message || err?.message || "Something went wrong"

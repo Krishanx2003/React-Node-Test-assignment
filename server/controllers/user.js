@@ -107,7 +107,6 @@ export const getEmployees = async (req, res, next) => {
 
 export const createClient = async (req, res, next) => {
     try {
-
         const findedUser = await User.findOne({ email: req.body.email })
         if (Boolean(findedUser)) return next(createError(400, 'Email already exist'))
 
@@ -118,6 +117,41 @@ export const createClient = async (req, res, next) => {
         next(createError(500, err.message))
     }
 }
+
+export const updateClient = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        // Check if email is being updated and if it already exists
+        if (updateData.email) {
+            const existingUser = await User.findOne({ email: updateData.email, _id: { $ne: id } });
+            if (existingUser) {
+                return next(createError(400, 'Email already exists'));
+            }
+        }
+
+        const updatedClient = await User.findByIdAndUpdate(
+            id,
+            { ...updateData },
+            { new: true }
+        );
+
+        if (!updatedClient) {
+            return next(createError(404, 'Client not found'));
+        }
+
+        res.status(200).json({ 
+            result: updatedClient, 
+            message: 'Client updated successfully', 
+            success: true 
+        });
+
+    } catch (err) {
+        next(createError(500, err.message));
+    }
+}
+
 export const createEmployee = async (req, res, next) => {
     try {
 

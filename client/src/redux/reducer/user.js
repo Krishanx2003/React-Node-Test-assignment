@@ -174,6 +174,11 @@ const usersSlice = createSlice({
             }
         },
 
+        updateClientReducer: (state, action) => {
+            state.clients = state.clients.map(client => 
+                client._id === action.payload._id ? action.payload : client
+            )
+        },
 
     }
 })
@@ -181,5 +186,6 @@ const usersSlice = createSlice({
 export const { start, end, error,
     getUsersReducer, getEmployeesReducer, getClientsReducer, searchUserReducer, searchEmployeeReducer, searchClientReducer, filterUserReducer, filterEmployeeReducer, filterClientReducer,
     registerReducer, loginReducer, logoutReducer, createClientReducer, createEmployeeReducer, getUserReducer, updateUserReducer, deleteUserReducer,
+    updateClientReducer,
 } = usersSlice.actions
 export default usersSlice.reducer

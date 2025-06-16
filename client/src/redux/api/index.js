@@ -57,6 +57,7 @@ export const createEmployee = (employeeData) => API.post(`/user/create/employee`
 export const updateRole = (userId, role) => API.put(`/user/update-role/${userId}`, { role })
 export const updateUser = (userId, userData) => API.put(`/user/update/${userId}`, userData)
 export const deleteUser = (userId) => API.delete(`/user/delete/${userId}`)
+export const updateClient = (clientData) => API.put(`/user/update/client/${clientData.id}`, clientData)
 
 
 // TASK

@@ -13,6 +13,7 @@ import { Dropdown, Menu, MenuButton, MenuItem, menuItemClasses } from "@mui/base
 import Filter from "./Filter";
 import User from "./User";
 import DeleteClient from "./Delete";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 
 const blue = {
   100: "#DAECFF",
@@ -88,6 +89,15 @@ const Clients = () => {
   ////////////////////////////////////// VARIABLES /////////////////////////////////////
   const dispatch = useDispatch();
   const { clients, isFetching, error, loggedUser } = useSelector((state) => state.user);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    username: '',
+    phone: '',
+    email: ''
+  });
   const columns = [
     {
       field: "uid",
@@ -139,10 +149,15 @@ const Clients = () => {
       headerClassName: "super-app-theme--header",
       renderCell: (params) => (
         <div className="flex gap-[10px]">
+          <Tooltip placement="top" title="Edit" arrow>
+            <CiEdit
+              onClick={() => handleOpenEditModal(params.row)}
+              className="cursor-pointer text-blue-500 text-[23px] hover:text-blue-400"
+            />
+          </Tooltip>
           {
             loggedUser?.role != 'employee' &&
             <Tooltip placement="top" title="Delete" arrow>
-              {" "}
               <PiTrashLight
                 onClick={() => handleOpenDeleteModal(params.row._id)}
                 className="cursor-pointer text-red-500 text-[23px] hover:text-red-400"
@@ -155,9 +170,7 @@ const Clients = () => {
   ];
 
   ////////////////////////////////////// STATES ////////////////////////////////////////
-  const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("");
   const [openFilters, setOpenFilters] = useState("");
   const [openUser, setOpenUser] = useState(false);
 
@@ -174,21 +187,93 @@ const Clients = () => {
   const handleClickOpen = () => {
     setOpenUser(true);
   };
-  const handleOpenEditModal = (employee) => {
-    dispatch(getUserReducer(employee));
-    setOpenEditModal(true);
+  const handleOpenEditModal = (client) => {
+    setSelectedClient(client);
+    setEditForm({
+      firstName: client.firstName || '',
+      lastName: client.lastName || '',
+      username: client.username || '',
+      phone: client.phone || '',
+      email: client.email || ''
+    });
+    setEditModalOpen(true);
   };
   const handleOpenDeleteModal = (userId) => {
     setSelectedUserId(userId);
     setOpenDeleteModal(true);
   };
 
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedClient(null);
+    setEditForm({
+      firstName: '',
+      lastName: '',
+      username: '',
+      phone: '',
+      email: ''
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      await dispatch(updateClient({ id: selectedClient._id, ...editForm }));
+      handleCloseEditModal();
+    } catch (error) {
+      console.error('Failed to update client:', error);
+    }
+  };
+
   return (
     <div className="w-full">
-
       <DeleteClient open={openDeleteModal} setOpen={setOpenDeleteModal} userId={selectedUserId} />
       <Filter open={openFilters} setOpen={setOpenFilters} />
       <User open={openUser} setOpen={setOpenUser} />
+
+      {/* Edit Client Modal */}
+      <Dialog open={editModalOpen} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit Client</DialogTitle>
+        <DialogContent>
+          <div className="flex flex-col gap-4 mt-4">
+            <TextField
+              label="First Name"
+              value={editForm.firstName}
+              onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Last Name"
+              value={editForm.lastName}
+              onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Username"
+              value={editForm.username}
+              onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Phone"
+              value={editForm.phone}
+              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Email"
+              value={editForm.email}
+              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+              fullWidth
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditModal}>Cancel</Button>
+          <Button onClick={handleEditSubmit} variant="contained" color="primary">
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Topbar />
       <Table

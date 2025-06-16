@@ -30,6 +30,7 @@ router.post('/create/employee', verifyToken, verifyManager, createEmployee)
 // PUT
 router.put('/update-role/:userId', verifyToken, verifyManager, updateRole)
 router.put('/update/:userId', verifyToken, verifySuperAdmin, updateUser)
+router.put('/update/client/:id', verifyToken, verifyEmployee, updateClient)
 
 // DELETE
 router.delete('/delete/:userId', verifyToken, verifySuperAdmin, deleteUser)

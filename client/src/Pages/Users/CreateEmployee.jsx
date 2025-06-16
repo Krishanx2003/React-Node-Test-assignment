@@ -36,28 +36,114 @@ const CreateUser = ({ open, setOpen, scroll }) => {
     email: "",
   }
 
+  const initialValidationState = {
+    firstName: { error: false, message: "" },
+    lastName: { error: false, message: "" },
+    username: { error: false, message: "" },
+    password: { error: false, message: "" },
+    phone: { error: false, message: "" },
+    email: { error: false, message: "" },
+  }
+
   //////////////////////////////////////// STATES /////////////////////////////////////
   const [employeeData, setEmployeeData] = useState(initialEmployeeState);
+  const [validationErrors, setValidationErrors] = useState(initialValidationState);
 
   //////////////////////////////////////// USE EFFECTS /////////////////////////////////////
 
   //////////////////////////////////////// FUNCTIONS /////////////////////////////////////
+  const validateField = (field, value) => {
+    let error = false;
+    let message = "";
+
+    switch (field) {
+      case "firstName":
+        if (!value.trim()) {
+          error = true;
+          message = "First name is required";
+        }
+        break;
+      case "lastName":
+        if (!value.trim()) {
+          error = true;
+          message = "Last name is required";
+        }
+        break;
+      case "username":
+        if (!value.trim()) {
+          error = true;
+          message = "Username is required";
+        }
+        break;
+      case "password":
+        if (!value) {
+          error = true;
+          message = "Password is required";
+        } else if (value.length < 6) {
+          error = true;
+          message = "Password must be at least 6 characters";
+        }
+        break;
+      case "phone":
+        if (!value) {
+          error = true;
+          message = "Phone number is required";
+        } else if (!/^\d{10,11}$/.test(value)) {
+          error = true;
+          message = "Please enter a valid phone number (10-11 digits)";
+        }
+        break;
+      case "email":
+        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = true;
+          message = "Please enter a valid email address";
+        }
+        break;
+      default:
+        break;
+    }
+
+    return { error, message };
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { firstName, lastName, username, password, phone, email } = employeeData
-    if (!firstName || !lastName || !username || !password || !phone  )
-      return alert("Make sure to provide all the fields")
+    const { firstName, lastName, username, password, phone, email } = employeeData;
+    
+    // Validate all fields
+    const newValidationErrors = { ...validationErrors };
+    let hasErrors = false;
+
+    Object.keys(employeeData).forEach(field => {
+      const validation = validateField(field, employeeData[field]);
+      newValidationErrors[field] = validation;
+      if (validation.error) hasErrors = true;
+    });
+
+    setValidationErrors(newValidationErrors);
+
+    if (hasErrors) {
+      return;
+    }
+
     dispatch(createEmployee(employeeData, setOpen));
-    setEmployeeData(initialEmployeeState)
+    setEmployeeData(initialEmployeeState);
+    setValidationErrors(initialValidationState);
   };
 
   const handleChange = (field, value) => {
-    setEmployeeData((prevFilters) => ({ ...prevFilters, [field]: value, }));
+    setEmployeeData((prevFilters) => ({ ...prevFilters, [field]: value }));
+    const validation = validateField(field, value);
+    setValidationErrors(prev => ({
+      ...prev,
+      [field]: validation
+    }));
   };
 
   const handleClose = () => {
     setOpen(false);
-    setEmployeeData(initialEmployeeState)
+    setEmployeeData(initialEmployeeState);
+    setValidationErrors(initialValidationState);
   };
 
   return (
@@ -93,6 +179,8 @@ const CreateUser = ({ open, setOpen, scroll }) => {
                     fullWidth
                     value={employeeData.firstName}
                     onChange={(e) => handleChange('firstName', e.target.value)}
+                    error={validationErrors.firstName.error}
+                    helperText={validationErrors.firstName.message}
                   />
                 </td>
               </tr>
@@ -104,6 +192,8 @@ const CreateUser = ({ open, setOpen, scroll }) => {
                     fullWidth
                     value={employeeData.lastName}
                     onChange={(e) => handleChange('lastName', e.target.value)}
+                    error={validationErrors.lastName.error}
+                    helperText={validationErrors.lastName.message}
                   />
                 </td>
               </tr>
@@ -115,6 +205,8 @@ const CreateUser = ({ open, setOpen, scroll }) => {
                     fullWidth
                     value={employeeData.username}
                     onChange={(e) => handleChange('username', e.target.value)}
+                    error={validationErrors.username.error}
+                    helperText={validationErrors.username.message}
                   />
                 </td>
               </tr>
@@ -127,6 +219,8 @@ const CreateUser = ({ open, setOpen, scroll }) => {
                     placeholder="Optional"
                     value={employeeData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
+                    error={validationErrors.email.error}
+                    helperText={validationErrors.email.message}
                   />
                 </td>
               </tr>
@@ -139,6 +233,8 @@ const CreateUser = ({ open, setOpen, scroll }) => {
                     onChange={(e) => handleChange("password", e.target.value)}
                     size="small"
                     fullWidth
+                    error={validationErrors.password.error}
+                    helperText={validationErrors.password.message}
                   />
                 </td>
               </tr>
@@ -151,6 +247,8 @@ const CreateUser = ({ open, setOpen, scroll }) => {
                     value={employeeData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     fullWidth
+                    error={validationErrors.phone.error}
+                    helperText={validationErrors.phone.message}
                   />
                 </td>
               </tr>

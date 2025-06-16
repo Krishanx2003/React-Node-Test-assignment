@@ -23,6 +23,7 @@ import transcriptRoutes from './routes/transcript.js'
 import projectRoutes from './routes/project.js'
 import societyRoutes from './routes/society.js'
 import inventoryRoutes from './routes/inventory.js'
+import clientRoutes from './routes/clientRoutes.js'
 
 dotenv.config()
 const app = express()
@@ -56,6 +57,7 @@ app.use('/api/v1/refund', refundRoutes)
 app.use('/api/v1/voucher', voucherRoutes)
 app.use('/api/v1/deduction', deductionRoutes)
 app.use('/api/v1/trasncript', transcriptRoutes)
+app.use('/api/clients', clientRoutes)
 
 app.get('/', (req, res) => {
     res.send('Welcome to the server')
